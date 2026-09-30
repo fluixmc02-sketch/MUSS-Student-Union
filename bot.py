@@ -39,8 +39,13 @@ from db import DB
 
 load_dotenv()
 
-BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
-ADMIN_IDS = {int(x) for x in os.environ.get("ADMIN_IDS", "").replace(" ", "").split(",") if x}
+def _env(name: str, default: str = "") -> str:
+    # Tolerate stray spaces or quotes pasted into hosting dashboards.
+    return os.environ.get(name, default).strip().strip('"').strip("'").strip()
+
+
+BOT_TOKEN = _env("BOT_TOKEN")
+ADMIN_IDS = {int(x) for x in _env("ADMIN_IDS").replace(" ", "").split(",") if x.isdigit()}
 TEAM_NAME = os.environ.get("TEAM_NAME", "Presidential Team")
 SCHOOL_NAME = os.environ.get("SCHOOL_NAME", "MUSS")
 DB_PATH = os.environ.get("DB_PATH", "bot.db")
@@ -758,8 +763,12 @@ async def on_error(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 def main() -> None:
-    if not BOT_TOKEN or not ADMIN_IDS:
-        raise SystemExit("Set BOT_TOKEN and ADMIN_IDS in your .env file (see .env.example).")
+    missing = [name for name, value in (("BOT_TOKEN", BOT_TOKEN), ("ADMIN_IDS", ADMIN_IDS)) if not value]
+    if missing:
+        raise SystemExit(
+            f"Missing setting(s): {', '.join(missing)}. On Railway add them under the service's "
+            "Variables tab and click Deploy; locally put them in a .env file (see .env.example)."
+        )
 
     db.purge_old_routes(ROUTE_RETENTION_DAYS)
     app = Application.builder().token(BOT_TOKEN).build()
