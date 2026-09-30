@@ -64,6 +64,23 @@ can find their ID by messaging [@userinfobot](https://t.me/userinfobot).
    python bot.py
    ```
 
+## Hosting 24/7 on Railway (recommended)
+
+1. Sign in at [railway.com](https://railway.com) with your GitHub account.
+2. **New Project → Deploy from GitHub repo →** pick `MUSS-Student-Union`
+   (allow Railway access to the repo if asked). It builds using the `Dockerfile` and `railway.json`.
+3. Open the service → **Variables** → add:
+   - `BOT_TOKEN` = your token from @BotFather
+   - `ADMIN_IDS` = `7517585192` (comma-separate more team members)
+4. **Add a volume** so tickets and polls aren't lost when the bot redeploys:
+   right-click the service (or press ⌘K / Ctrl+K) → **Add Volume** → mount path `/data`.
+5. Watch **Deployments → View logs** until you see `Bot is running`. Then send `/start` to the bot.
+
+Every push to the GitHub branch redeploys automatically. Only run **one** copy of the bot at a
+time — stop it on your PC, otherwise Telegram reports a `Conflict` error.
+
+### Other hosting
+
 The bot must be running somewhere 24/7 for students to use it — a cheap VPS, a Raspberry Pi,
 [PythonAnywhere](https://www.pythonanywhere.com/) (always-on task), Railway, Render, Fly.io, etc.
 With Docker:

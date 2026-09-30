@@ -9,6 +9,7 @@ Anonymity rules enforced here:
 
 import hashlib
 import hmac
+import os
 import secrets
 import sqlite3
 import time
@@ -61,6 +62,8 @@ CREATE TABLE IF NOT EXISTS votes (
 
 class DB:
     def __init__(self, path: str):
+        if os.path.dirname(path):
+            os.makedirs(os.path.dirname(path), exist_ok=True)
         self.conn = sqlite3.connect(path)
         self.conn.row_factory = sqlite3.Row
         self.conn.executescript(SCHEMA)
